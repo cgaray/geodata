@@ -1,0 +1,20 @@
+version: '3'
+services:
+  db:
+    image: mongo
+    container_name: geodata-db
+    restart: always
+    environment:
+      MONGO_INITDB_DATABASE: geodata-dev
+    ports:
+      - "27020-27022:27017-27019"
+  bi:
+    build: ./bi
+    container_name: geodata-bi
+    hostname: mongo-bi
+    restart: always
+    volumes:
+      - /Users/kylecombes/Segregated/mongosqld:/home/mongobi
+      - /Users/kylecombes/Segregated/logs:/logs
+    ports:
+      - "3307:3307"

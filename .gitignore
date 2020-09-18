@@ -1,0 +1,12 @@
+# IDE
+.idea
+
+# Node
+node_modules
+
+# Build output
+*.pyc
+build/
+
+# Misc
+*.log
