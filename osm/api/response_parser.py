@@ -22,7 +22,7 @@ class Node:
     @staticmethod
     def from_xml(node_node):
         attrs = node_node.attrib
-        return Node(attrs['ref'], attrs['lat'], attrs['lon'])
+        return Node(int(attrs['ref']), float(attrs['lat']), float(attrs['lon']))
 
     def __str__(self):
         return f'Node {self.ref}: ({self.lat},{self.lon}'
@@ -49,6 +49,9 @@ class BoundingBox:
         """
         attrs = xml_node.attrib
         return BoundingBox(attrs['minlat'], attrs['minlon'], attrs['maxlat'], attrs['maxlon'])
+
+    def __str__(self):
+        return f'{self.min_lat},{self.min_lon},{self.max_lat},{self.max_lon}'
 
 
 class Tag:

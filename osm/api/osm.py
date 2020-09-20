@@ -1,6 +1,6 @@
 import requests
 
-from response_parser import parse_api_response
+from .response_parser import parse_api_response
 
 _API_BASE = 'https://overpass-api.de/api/interpreter'
 
@@ -14,19 +14,12 @@ bounding_box = {
 }
 
 
-def _bounding_box_to_query_str(bb):
+def bounding_box_to_query_str(bb):
     return f"{bb['minLat']},{bb['minLon']},{bb['maxLat']},{bb['maxLon']}"
 
 
 def InvalidHTTPResponse(Exception):
     pass
-
-
-def _get(query):
-    response = requests.post(_API_BASE, data=query)
-    if response.status_code != 200:
-        raise InvalidHTTPResponse(response.text)
-    return parse_api_response(response.text)
 
 
 class QueryBuilder:
@@ -51,17 +44,19 @@ class QueryBuilder:
             resulting_text = resulting_text.replace(f'{{{{{placeholder_name}}}}}', value_to_use)
         return resulting_text
 
-    def build_query(self, bbox=None):
-        placeholder_lookup_table = {
-            'bbox': _bounding_box_to_query_str(bbox),
-        }
-        return '\n'.join(map(lambda c: self.__replace_placeholders(c, placeholder_lookup_table), self._components))
+    def execute(self, **kwargs):
+        placeholder_lookup_table = {k: str(v) for k, v in kwargs.items()}
+        query_str = '\n'.join(map(lambda c: self.__replace_placeholders(c, placeholder_lookup_table), self._components))
+        response = requests.post(_API_BASE, data=query_str)
+        if response.status_code != 200:
+            raise InvalidHTTPResponse(response.text)
+        return parse_api_response(response.text)
 
 
 if __name__ == '__main__':
     query = QueryBuilder()
     query.add_component('nwr[name="Main Street"]({{bbox}});')
     query.add_component('out geom;')
-    res = _get(query.build_query(bbox=bounding_box))
+    res = query.execute(bbox=bounding_box)
     for r in res:
         print(r)
