@@ -1,6 +1,5 @@
 from map import Map
 from api.osm import QueryBuilder, bounding_box_to_query_str
-from api.response_parser import parse_api_response
 from visualizer import visualize_map
 
 

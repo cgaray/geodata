@@ -1,4 +1,5 @@
 from xml.etree import ElementTree
+from ..models import BoundingBox
 
 
 def parse_api_response(xml):
@@ -28,30 +29,12 @@ class Node:
         return f'Node {self.ref}: ({self.lat},{self.lon}'
 
 
-class BoundingBox:
-    def __init__(self, min_lat, min_lon, max_lat, max_lon):
-        """
-        Represents a bounding box based on min and max latitude and longitude values.
-        :type min_lat: float
-        :type min_lon: float
-        :type max_lat: float
-        :type max_lon: float
-        """
-        self.min_lat = min_lat
-        self.min_lon = min_lon
-        self.max_lat = max_lat
-        self.max_lon = max_lon
-
-    @staticmethod
-    def from_xml(xml_node):
-        """
-        :type xml_node: ElementTree.Element
-        """
-        attrs = xml_node.attrib
-        return BoundingBox(attrs['minlat'], attrs['minlon'], attrs['maxlat'], attrs['maxlon'])
-
-    def __str__(self):
-        return f'{self.min_lat},{self.min_lon},{self.max_lat},{self.max_lon}'
+def bounding_box_from_xml(xml_node):
+    """
+    :type xml_node: ElementTree.Element
+    """
+    attrs = xml_node.attrib
+    return BoundingBox(attrs['minlat'], attrs['minlon'], attrs['maxlat'], attrs['maxlon'])
 
 
 class Tag:
@@ -97,7 +80,7 @@ class Way:
         tags = []
         for child in way_node:
             if child.tag == 'bounds':
-                bounds = BoundingBox.from_xml(child)
+                bounds = bounding_box_from_xml(child)
             elif child.tag == 'nd':
                 nodes.append(Node.from_xml(child))
             elif child.tag == 'tag':
