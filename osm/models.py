@@ -1,6 +1,7 @@
 from skimage import io
 from pathlib import Path
 import numpy as np
+from typing import List
 
 
 class BoundingBox:
@@ -35,6 +36,9 @@ class Coordinate:
     def __str__(self):
         return f'{self.lat},{self.lon}'
 
+    def __eq__(self, other):
+        return self.lat == other.lat and self.lon == other.lon
+
 
 class Image:
 
@@ -47,3 +51,25 @@ class Image:
     def load_from_disk(file_path: Path, bounding_box: BoundingBox):
         data = io.imread(str(file_path))
         return Image(data, bounding_box, file_path)
+
+    def get_pixel_coords(self) -> List[List[Coordinate]]:
+        """
+        Calculates a matrix of lat-lon coordinate pairs for every pixel in the image.
+        :return: a matrix of Coordinates where the first index corresponds to y and
+        the second index corresponds to x.
+        """
+        width = len(self.data[0])
+        height = len(self.data)
+        lat_range = self.bounds.max_lat - self.bounds.min_lat
+        lng_range = self.bounds.max_lon - self.bounds.min_lon
+        pixel_width = lng_range / width
+        pixel_height = lat_range / height
+        res = []
+        for y in range(height):
+            res.append([])
+            for x in range(width):
+                res[y].append(Coordinate(
+                    lat=(y + 0.5) * pixel_height + self.bounds.min_lat,
+                    lon=(x + 0.5) * pixel_width + self.bounds.min_lon
+                ))
+        return res
