@@ -1,4 +1,5 @@
 import requests
+from osm.models import BoundingBox
 
 from .response_parser import parse_api_response
 
@@ -6,16 +7,16 @@ _API_BASE = 'https://overpass-api.de/api/interpreter'
 
 # nwr[name="Main+Street"](42.34738030389109,-71.09038352966309,42.44524802967223,-71.01253509521483);out+geom;
 
-bounding_box = {
-    'minLat': 42.34738030389109,
-    'minLon': -71.09038352966309,
-    'maxLat': 42.44524802967223,
-    'maxLon': -71.01253509521483,
-}
+bounding_box = BoundingBox(
+    min_lat=42.34738030389109,
+    min_lon=-71.09038352966309,
+    max_lat=42.44524802967223,
+    max_lon=-71.01253509521483,
+)
 
 
-def bounding_box_to_query_str(bb):
-    return f"{bb['minLat']},{bb['minLon']},{bb['maxLat']},{bb['maxLon']}"
+def bounding_box_to_query_str(bb: BoundingBox):
+    return f'{bb.min_lat},{bb.min_lon},{bb.max_lat},{bb.max_lon}'
 
 
 def InvalidHTTPResponse(Exception):

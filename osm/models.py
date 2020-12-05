@@ -46,6 +46,8 @@ class Image:
         self.data = data
         self.bounds = bounds
         self.file_path = file_path
+        self.width = len(self.data[0])
+        self.height = len(self.data)
 
     @staticmethod
     def load_from_disk(file_path: Path, bounding_box: BoundingBox):
@@ -56,20 +58,29 @@ class Image:
         """
         Calculates a matrix of lat-lon coordinate pairs for every pixel in the image.
         :return: a matrix of Coordinates where the first index corresponds to y and
-        the second index corresponds to x.
+        the second index corresponds to x (origin at top left).
         """
-        width = len(self.data[0])
-        height = len(self.data)
         lat_range = self.bounds.max_lat - self.bounds.min_lat
         lng_range = self.bounds.max_lon - self.bounds.min_lon
-        pixel_width = lng_range / width
-        pixel_height = lat_range / height
+        pixel_width = lng_range / self.width
+        pixel_height = lat_range / self.height
         res = []
-        for y in range(height):
+        for y in range(self.height):
             res.append([])
-            for x in range(width):
+            for x in range(self.width):
                 res[y].append(Coordinate(
-                    lat=(y + 0.5) * pixel_height + self.bounds.min_lat,
+                    lat=((self.height - y) + 0.5) * pixel_height + self.bounds.min_lat,
                     lon=(x + 0.5) * pixel_width + self.bounds.min_lon
                 ))
         return res
+
+
+class Line:
+    def __init__(self, m: float, b: float):
+        """
+        Creates a new line.
+        :param m: the slope
+        :param b: the y-intercept
+        """
+        self.m = m
+        self.b = b

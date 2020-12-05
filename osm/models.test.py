@@ -28,5 +28,8 @@ class TestImageMethods(unittest.TestCase):
         self.assertEqual(img.get_pixel_coords()[8][4], Coordinate(85.0, 545.0))
 
 
+## TODO: Check multiple points
+
+
 if __name__ == '__main__':
     unittest.main()
