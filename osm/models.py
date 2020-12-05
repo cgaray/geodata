@@ -42,17 +42,17 @@ class Coordinate:
 
 class Image:
 
-    def __init__(self, data: np.ndarray, bounds: BoundingBox, file_path: Path):
+    def __init__(self, data: np.ndarray, bounds: BoundingBox):
         self.data = data
         self.bounds = bounds
-        self.file_path = file_path
         self.width = len(self.data[0])
         self.height = len(self.data)
+        self.channels = len(self.data[0][0])
 
     @staticmethod
     def load_from_disk(file_path: Path, bounding_box: BoundingBox):
         data = io.imread(str(file_path))
-        return Image(data, bounding_box, file_path)
+        return Image(data, bounding_box)
 
     def get_pixel_coords(self) -> List[List[Coordinate]]:
         """

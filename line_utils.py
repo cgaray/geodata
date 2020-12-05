@@ -1,4 +1,5 @@
 import math
+import numpy as np
 from osm.models import Coordinate, Image, Line
 from typing import List
 
@@ -45,8 +46,12 @@ def _order_lines(lines: List[Line]) -> List[Line]:
     return pos_m + neg_m
 
 
-def highlight_path(img: Image, path: List[Coordinate], width: float) -> None:
+def highlight_path(img: Image, path: List[Coordinate], width: float) -> Image:
     pixel_coords = img.get_pixel_coords()
+    highlight_mask = Image(
+        data=np.zeros((img.height, img.width, img.channels)),
+        bounds=img.bounds,
+    )
 
     # For each path segment
     for p1, p2 in _gen_path_pairs(path):
@@ -74,4 +79,6 @@ def highlight_path(img: Image, path: List[Coordinate], width: float) -> None:
         for y, row in enumerate(pixel_coords):
             for x, pixel in enumerate(row):
                 if _pixel_within_lines(pixel, lines):
-                    img.data[y][x] = (255, 0, 0, 255)
+                    highlight_mask.data[y][x] = (255, 0, 0, 255)
+
+    return highlight_mask

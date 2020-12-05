@@ -20,14 +20,15 @@ query.add_component('nwr[name="Main Street"]({{bbox}});')
 query.add_component('out geom;')
 res = query.execute(bbox=bounding_box_to_query_str(image.bounds))
 
+m = Map(bbox=image.bounds)
+m.add_object(image)
+
 # Highlight the road paths
 for way in res:
     # Updates `image`
-    highlight_path(image, way.nodes, 0.0001)
+    m.add_object(highlight_path(image, way.nodes, 0.00007))
 
 # m = Map(bbox=BoundingBox(bbox['minLat'], bbox['minLon'], bbox['maxLat'], bbox['maxLon']))
-m = Map(bbox=image.bounds)
-m.add_object(image)
 # for r in res:
 #     m.add_object(r)
 visualize_map(m)

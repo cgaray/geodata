@@ -4,23 +4,12 @@ from .models import BoundingBox, Image
 from .api.response_parser import Way
 
 
-ImageList = List[Image]
-WayList = List[Way]
-
 class Map:
 
     def __init__(self, bbox: BoundingBox = None):
         self.bounding_box = bbox
-        self.ways = self.__new_way_list()
-        self.images = self.__new_image_list()
-
-    @staticmethod
-    def __new_way_list() -> WayList:
-        return []
-
-    @staticmethod
-    def __new_image_list() -> ImageList:
-        return []
+        self.ways: List[Way] =[]
+        self.images: List[Image] = []
 
     def add_object(self, obj):
         if type(obj) is Way:

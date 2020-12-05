@@ -1,5 +1,4 @@
 import unittest
-from pathlib import Path
 import numpy as np
 
 from osm.models import BoundingBox, Coordinate, Image
@@ -9,13 +8,11 @@ class TestImageMethods(unittest.TestCase):
 
     def test_get_pixel_coords(self):
         data = np.zeros((10, 10))
-        file_path = Path.cwd()
 
         # Simple 0,0 to 100,100
         img = Image(
             data=data,
             bounds=BoundingBox(0, 0, 100, 100),
-            file_path=file_path
         )
         self.assertEqual(img.get_pixel_coords()[0][0], Coordinate(5, 5))
 
@@ -23,7 +20,6 @@ class TestImageMethods(unittest.TestCase):
         img = Image(
             data=data,
             bounds=BoundingBox(0, 500, 100, 600),
-            file_path=file_path
         )
         self.assertEqual(img.get_pixel_coords()[8][4], Coordinate(85.0, 545.0))
 
