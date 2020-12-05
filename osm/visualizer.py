@@ -2,10 +2,7 @@ from .map import Map
 import matplotlib.pyplot as plt
 
 
-def visualize_map(map_obj):
-    """
-    :type map_obj: Map
-    """
+def visualize_map(map_obj, title: str = None):
     for img in map_obj.images:
         extent = (
             img.bounds.min_lon,
@@ -23,6 +20,8 @@ def visualize_map(map_obj):
             ys.append(n.lat)
         plt.plot(xs, ys, '-')
 
+    if title:
+        plt.title(title)
     plt.xlabel('Longitude')
     plt.ylabel('Latitude')
 
