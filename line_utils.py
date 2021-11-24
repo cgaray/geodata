@@ -48,7 +48,7 @@ def _order_lines(lines: List[Line]) -> List[Line]:
     return pos_m + neg_m
 
 
-def highlight_path(img: Image, path: List[Coordinate], width: float) -> Image:
+def highlight_path(img: Image, path: List[Coordinate]) -> Image:
     pixel_coords = img.get_pixel_coords()
     highlight_mask = Image(
         data=np.zeros((img.height, img.width, img.channels)),
@@ -57,12 +57,14 @@ def highlight_path(img: Image, path: List[Coordinate], width: float) -> Image:
 
     # For each path segment
     for point_pair in _gen_path_pairs(path):
-        highlight_line_segment(
-            mask=highlight_mask,
-            point_pair=point_pair,
-            width=width,
-            pixel_coords=pixel_coords
-        )
+        width = calculate_road_width(img, point_pair, threshold=30, max_width=0.0001, pixel_coords=pixel_coords)
+        if width:
+            highlight_line_segment(
+                mask=highlight_mask,
+                point_pair=point_pair,
+                width=width,
+                pixel_coords=pixel_coords
+            )
 
     return highlight_mask
 
@@ -105,8 +107,8 @@ def _calc_pixel_dist(p: np.array) -> float:
     return float(np.sqrt(np.dot(offset, np.transpose(offset))))
 
 
-from osm.visualizer import visualize_map
-from osm.map import Map
+# from osm.visualizer import visualize_map
+# from osm.map import Map
 
 def calculate_road_width(img: Image, point_pair: PointPair, threshold: float, max_width: float, pixel_coords: List[List[Coordinate]]) -> float:
     prev_width = 0
@@ -129,10 +131,10 @@ def calculate_road_width(img: Image, point_pair: PointPair, threshold: float, ma
                     # print(d)
                     if d < threshold:
                         road_pixel_count += 1
-        m = Map(img.bounds)
-        m.add_object(img)
-        m.add_object(mask)
-        visualize_map(m, f'Width: {width}')
+        # m = Map(img.bounds)
+        # m.add_object(img)
+        # m.add_object(mask)
+        # visualize_map(m, f'Width: {width}')
         if mask_pixel_count == 0:
             continue
         if road_pixel_count / mask_pixel_count > 0.8:

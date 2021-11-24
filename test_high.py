@@ -25,20 +25,8 @@ m.add_object(image)
 
 # Highlight the road paths
 for way in res:
-    # Calculate image
-    width = calculate_road_width(
-        img=image,
-        point_pair=(way.nodes[0], way.nodes[1]),
-        threshold=30,
-        max_width=0.0001,
-        pixel_coords=image.get_pixel_coords(),
-    )
-
-    if width:
-        # Add a mask layer for the road segment
-        m.add_object(highlight_path(image, way.nodes, width))
-    else:
-        print('Width is None')
+    # Add a mask layer for the road segment
+    m.add_object(highlight_path(image, way.nodes))
 
 # m = Map(bbox=BoundingBox(bbox['minLat'], bbox['minLon'], bbox['maxLat'], bbox['maxLon']))
 # for r in res:
