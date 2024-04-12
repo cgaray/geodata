@@ -1,7 +1,7 @@
-import axios, { AxiosInstance } from 'axios';
-import axiosCookieJarSupport from 'axios-cookiejar-support';
-import * as tough from 'tough-cookie';
-import jsdom from 'jsdom';
+import axios, { AxiosInstance } from "axios";
+import axiosCookieJarSupport from "axios-cookiejar-support";
+import * as tough from "tough-cookie";
+import jsdom from "jsdom";
 const { JSDOM } = jsdom;
 
 // @ts-ignore
@@ -55,28 +55,33 @@ export default class PatriotPropertiesAPI {
     this.connInitialized = false;
   }
 
-  initCookie = () => this.apiConn.get('/');
+  initCookie = () => this.apiConn.get("/");
 
-  buildQuery = (data: Record<string, string | number>) => Object.keys(data).map(k => `${k}=${data[k]}`).join('&');
+  buildQuery = (data: Record<string, string | number>) =>
+    Object.keys(data)
+      .map((k) => `${k}=${data[k]}`)
+      .join("&");
 
   processSearchResultTableRow = (row: HTMLTableRowElement) => {
-    const cols = row.querySelectorAll('td');
+    const cols = row.querySelectorAll("td");
     const parcelId = cols[0].textContent;
     const streetNum = /^\d*/.exec(cols[1].textContent)[0];
-    const streetName = cols[1].querySelector('a').textContent;
+    const streetName = cols[1].querySelector("a").textContent;
     const owners = [];
-    cols[2].querySelectorAll('a').forEach(a => owners.push(a.textContent));
-    const yearBuilt = cols[3].querySelectorAll('a')[0]?.textContent;
-    const buildingType = cols[3].querySelectorAll('a')[1]?.textContent;
+    cols[2].querySelectorAll("a").forEach((a) => owners.push(a.textContent));
+    const yearBuilt = cols[3].querySelectorAll("a")[0]?.textContent;
+    const buildingType = cols[3].querySelectorAll("a")[1]?.textContent;
     const value = cols[4].textContent;
     const beds = /^\d*/.exec(cols[5]?.textContent)[0];
     const baths = /\d*$/.exec(cols[5]?.textContent)[0];
     const lotSize = /^(\d|,)*/.exec(cols[6]?.textContent)[0];
     const finArea = /(\d|,)*$/.exec(cols[6]?.textContent)[0];
-    const luc = cols[7].querySelectorAll('a')[0]?.textContent;
-    const description =  cols[7].querySelectorAll('a')[1]?.textContent;
+    const luc = cols[7].querySelectorAll("a")[0]?.textContent;
+    const description = cols[7].querySelectorAll("a")[1]?.textContent;
     const neighborhood = cols[8].textContent;
-    const saleDate =  /^\d{1,2}\/\d{1,2}\/\d{4}/.exec(cols[9]?.textContent)?.pop();
+    const saleDate = /^\d{1,2}\/\d{1,2}\/\d{4}/
+      .exec(cols[9]?.textContent)
+      ?.pop();
     const salePrice = /(\d|,)*$/.exec(cols[9]?.textContent)?.pop();
     return {
       baths: baths ? parseInt(baths) : undefined,
@@ -96,21 +101,24 @@ export default class PatriotPropertiesAPI {
       value,
       yearBuilt: yearBuilt ? parseInt(yearBuilt) : undefined,
     };
-  }
+  };
 
-  getBookPageCount = async (book: number) => {
+  getPageCount = async (year_built: number) => {
     const reqData = {
-      SearchBook: `${book}`,
+      SearchYearBuilt: `${year_built}`,
       SearchSubmitted: "yes",
       cmdGo: "Go",
     };
-    const response = await this.apiConn.post('/SearchResults.asp', this.buildQuery(reqData));
+    const response = await this.apiConn.post(
+      "/SearchResults.asp",
+      this.buildQuery(reqData)
+    );
     const dom = new JSDOM(response.data);
     const { body } = dom.window.document;
-    const pageCountText = body.querySelector('tr').textContent;
+    const pageCountText = body.querySelector("tr").textContent;
     const countStr = /page \d* of (\d*)/.exec(pageCountText)?.pop();
     return countStr ? parseInt(countStr) : undefined;
-  }
+  };
 
   getPropertyList = async (query: SearchQuery) => {
     const reqData = {
@@ -118,22 +126,29 @@ export default class PatriotPropertiesAPI {
       SearchSubmitted: "yes",
       cmdGo: "Go",
     };
-    const response = await this.apiConn.post('/SearchResults.asp', this.buildQuery(reqData));
+    const response = await this.apiConn.post(
+      "/SearchResults.asp",
+      this.buildQuery(reqData)
+    );
     const dom = new JSDOM(response.data);
     const { body } = dom.window.document;
 
     // Pull the results out of the table
-    const tableRows = body.querySelector('#T1').querySelector('tbody').querySelectorAll('tr');
+    const tableRows = body
+      .querySelector("#T1")
+      .querySelector("tbody")
+      .querySelectorAll("tr");
     const res = [];
-    tableRows.forEach(r => res.push(this.processSearchResultTableRow(r)));
+    tableRows.forEach((r) => res.push(this.processSearchResultTableRow(r)));
     return res;
   };
 
-  getProperty = async ({accountNumber}: PatriotPropertiesQuery) => {
+  getProperty = async ({ accountNumber }: PatriotPropertiesQuery) => {
     if (!this.connInitialized) await this.initCookie();
-    const prelimResponse = await this.apiConn.get(`/Summary.asp?AccountNumber=${accountNumber}`);
-    if (prelimResponse.status !== 200)
-      throw Error(prelimResponse.data);
+    const prelimResponse = await this.apiConn.get(
+      `/Summary.asp?AccountNumber=${accountNumber}`
+    );
+    if (prelimResponse.status !== 200) throw Error(prelimResponse.data);
     const response = await this.apiConn.get(`/summary-bottom.asp`);
     const dom = new JSDOM(response.data);
     const body = dom.window.document.body;

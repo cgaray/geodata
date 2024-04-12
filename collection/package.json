@@ -18,9 +18,11 @@
     "axios-cookiejar-support": "^1.0.0",
     "jsdom": "^16.4.0",
     "mongodb": "^3.6.0",
+    "p-throttle": "^6.1.0",
     "tough-cookie": "^4.0.0"
   },
   "devDependencies": {
+    "@types/node": "^20.12.7",
     "@types/tough-cookie": "^4.0.0",
     "ts-node": "^8.10.2",
     "typescript": "^3.9.7"
