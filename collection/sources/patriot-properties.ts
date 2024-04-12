@@ -120,14 +120,14 @@ export default class PatriotPropertiesAPI {
     return countStr ? parseInt(countStr) : undefined;
   };
 
-  getPropertyList = async (query: SearchQuery) => {
+  getPropertyList = async (query: SearchQuery, page: number) => {
     const reqData = {
       ...query,
       SearchSubmitted: "yes",
       cmdGo: "Go",
     };
     const response = await this.apiConn.post(
-      "/SearchResults.asp",
+      `/SearchResults.asp?page=${page}`,
       this.buildQuery(reqData)
     );
     const dom = new JSDOM(response.data);
@@ -139,6 +139,7 @@ export default class PatriotPropertiesAPI {
       .querySelector("tbody")
       .querySelectorAll("tr");
     const res = [];
+    console.log(`Found ${tableRows.length} results on page ${page}.`);
     tableRows.forEach((r) => res.push(this.processSearchResultTableRow(r)));
     return res;
   };

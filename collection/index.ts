@@ -11,7 +11,7 @@ if (!city) {
 
 // Be nice to the server and don't hammer it with requests
 const throttle = pThrottle({
-  limit: 2, // Maximum number of API requests per interval
+  limit: 3, // Maximum number of API requests per interval
   interval: 2000, // Interval in milliseconds
   onDelay: () => {
     console.log("Reached interval limit, call is delayed");
@@ -19,11 +19,14 @@ const throttle = pThrottle({
 });
 
 const processPage = throttle(
-  async (client, scraper, year_built, p, pageCount) => {
+  async (client, scraper, year_built, page, pageCount) => {
     try {
-      const properties = await scraper.getPropertyList({
-        SearchYearBuilt: year_built,
-      });
+      const properties = await scraper.getPropertyList(
+        {
+          SearchYearBuilt: year_built,
+        },
+        page
+      );
 
       if (properties.length > 0) {
         const upsertOperations = properties.map((property) => ({
@@ -39,9 +42,9 @@ const processPage = throttle(
           .bulkWrite(upsertOperations);
       }
 
-      console.log(`Processed page ${p} of ${pageCount}`);
+      console.log(`Processed page ${page} of ${pageCount}`);
     } catch (error) {
-      console.error(`Error processing page ${p} of ${pageCount}:`, error);
+      console.error(`Error processing page ${page} of ${pageCount}:`, error);
     }
   }
 );
