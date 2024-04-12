@@ -61,7 +61,9 @@ const downloadBook = async (client: any, year_built: number) => {
 };
 
 const runMe = async () => {
-  const client = new mongo.MongoClient("mongodb://localhost:27020");
+  const client = new mongo.MongoClient("mongodb://localhost:27020", {
+    useUnifiedTopology: true,
+  });
 
   try {
     await client.connect();
